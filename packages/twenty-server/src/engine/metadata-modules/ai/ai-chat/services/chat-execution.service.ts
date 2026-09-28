@@ -11,7 +11,10 @@ import {
   type SystemModelMessage,
   type ToolSet,
 } from 'ai';
-import { type ExtendedUIMessage } from 'twenty-shared/ai';
+import {
+  getAiModelTierFromModelId,
+  type ExtendedUIMessage,
+} from 'twenty-shared/ai';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
@@ -161,6 +164,11 @@ export class ChatExecutionService {
 
     const locale = userContext.locale as keyof typeof APP_LOCALES;
 
+    const resolvedChatModelId = getChatModelId({
+      requestedModelId: modelId,
+      workspace,
+    });
+
     const toolContext = {
       workspaceId: workspace.id,
       roleId,
@@ -169,6 +177,11 @@ export class ChatExecutionService {
       userWorkspaceId,
       threadId,
       locale,
+      modelId: resolvedChatModelId,
+      aiModelTier:
+        getAiModelTierFromModelId(resolvedChatModelId) ??
+        workspace.aiChatModelTier,
+      usageOperationType: UsageOperationType.AI_CHAT_TOKEN,
       onCodeExecutionUpdate,
     };
 
@@ -198,16 +211,11 @@ export class ChatExecutionService {
       { compactOutput: true, spillLargeOutput: true },
     );
 
-    const resolvedModelId = getChatModelId({
-      requestedModelId: modelId,
-      workspace,
-    });
-
-    this.aiModelRegistryService.validateModelAvailability(resolvedModelId);
+    this.aiModelRegistryService.validateModelAvailability(resolvedChatModelId);
 
     const registeredModel =
       await this.aiModelRegistryService.resolveModelForAgent(
-        { modelId: resolvedModelId },
+        { modelId: resolvedChatModelId },
         workspace,
       );
 

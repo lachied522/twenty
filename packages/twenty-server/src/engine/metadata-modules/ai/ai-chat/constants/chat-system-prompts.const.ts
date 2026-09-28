@@ -20,6 +20,7 @@ Examples:
 - User asks to create a workflow → \`load_skills(["workflow-building"])\` then learn and execute workflow tools
 - User asks to run a task on a schedule / recurring agent job → \`load_skills(["workflow-building"])\` then \`create_scheduled_agent_workflow\`
 - User asks to export data to Excel → \`load_skills(["xlsx", "code-interpreter"])\` then \`learn_tools({toolNames: ["code_interpreter"]})\` then \`execute_tool({toolName: "code_interpreter", arguments: {...}})\`
+- User asks to generate or edit an image → \`learn_tools({toolNames: ["image_generate", "deliver_file"]})\` then \`execute_tool\` for \`image_generate\`. Call \`deliver_file\` with that \`fileId\` only when they should see it in chat; skip deliver if you are embedding it in a PDF, email, or Drive file
 - User mentions a file, PDF, document, image, or "my files" without a CRM record → \`learn_tools({toolNames: ["list_drive_spaces", "list_drive_items"]})\` then \`execute_tool\`. Drive listing needs no skill. Do not wait for them to say "Drive"
 - User asks to read or analyse a PDF, image, or spreadsheet from Drive → \`learn_tools({toolNames: ["list_drive_items", "code_interpreter"]})\` then \`drive.pull\` in the sandbox. Never \`read_drive_file\` for binaries
 - User asks to save a generated file to Drive → \`drive.publish\` in the same \`code_interpreter\` call that created it, or \`copy_file_to_drive\` if it was already harvested into chat
@@ -58,6 +59,7 @@ When the user mentions a file, PDF, document, image, spreadsheet, or "my files" 
 - \`read_drive_file\` takes \`path\` (the \`virtualPath\` from \`list_drive_items\`, e.g. \`/personal/notes.md\`). Prefer \`path\` over \`fileId\`. Text and markdown only.
 - PDFs, images, Office files, and large files cannot be read into chat. Use \`code_interpreter\` with \`drive.pull(virtual_path, dest_path)\` (needs READ). \`drive.pull\` and \`drive.publish\` are Python helpers already bound in the sandbox — they are not \`execute_tool\` names.
 - \`/home/user/output\` is harvested into this chat and cleared every interpreter call. Durable files belong in Drive: \`drive.publish(source_path, virtual_path, generator_path=...)\` in the same run (needs READ_WRITE), or \`copy_file_to_drive\` afterwards with the harvested chat \`fileId\` and a destination such as \`/personal/hello_world.pdf\`.
+- Generated images from \`image_generate\` are chat files too. Pass that \`fileId\` to \`deliver_file\` to show a preview in this chat, to \`copy_file_to_drive\` to keep it, or to email/PDF tools to attach it.
 - When you generate a file from a script, publish the generator beside the artefact and revise by editing the script.
 - Hidden organisation spaces look the same as missing files — do not probe for names the user cannot see.
 - \`share_drive_item\` shares a personal item with a coworker; they cannot see the rest of that personal space.

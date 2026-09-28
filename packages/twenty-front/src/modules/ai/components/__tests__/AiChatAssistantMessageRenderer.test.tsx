@@ -4,6 +4,12 @@ import { type ExtendedUIMessagePart } from 'twenty-shared/ai';
 
 import { AiChatAssistantMessageRenderer } from '@/ai/components/AiChatAssistantMessageRenderer';
 
+jest.mock('@/ai/components/AiChatInitialLoadingIndicator', () => ({
+  AiChatInitialLoadingIndicator: () => (
+    <div data-testid="initial-loading-indicator" />
+  ),
+}));
+
 jest.mock('@/ai/components/ThinkingStepsDisplay', () => ({
   ThinkingStepsDisplay: ({
     hasAssistantTextResponseStarted,
@@ -166,6 +172,59 @@ describe('AiChatAssistantMessageRenderer', () => {
       'thinking-1-answer-pending',
     );
     expect(screen.queryByTestId('tool-step-renderer')).toBeNull();
+  });
+
+  it('should render deliver_file outside thinking so the preview card can show', () => {
+    const messageParts = [
+      {
+        type: 'reasoning',
+        text: 'I will generate then deliver',
+        state: 'done',
+      },
+      {
+        type: 'tool-execute_tool',
+        toolCallId: 'generate-1',
+        input: {
+          toolName: 'image_generate',
+          arguments: { prompt: 'A golden retriever puppy' },
+        },
+        output: { result: { fileId: 'file-1' } },
+        state: 'output-available',
+      },
+      {
+        type: 'tool-execute_tool',
+        toolCallId: 'deliver-1',
+        input: {
+          toolName: 'deliver_file',
+          arguments: { fileId: 'file-1' },
+        },
+        output: {
+          result: {
+            fileId: 'file-1',
+            filename: 'golden-retriever.png',
+            url: 'https://example.com/file.png',
+            mimeType: 'image/png',
+          },
+        },
+        state: 'output-available',
+      },
+      {
+        type: 'text',
+        text: 'Here is your image.',
+      },
+    ] as ExtendedUIMessagePart[];
+
+    renderAssistantRenderer(messageParts);
+
+    expect(screen.getByTestId('thinking-steps-display')).toHaveTextContent(
+      'thinking-2-answer-started',
+    );
+    expect(screen.getByTestId('tool-step-renderer')).toHaveTextContent(
+      'tool-execute_tool',
+    );
+    expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+      'Here is your image.',
+    );
   });
 
   it('should hide execute_tool wrapping code_interpreter when data-code-execution parts exist', () => {

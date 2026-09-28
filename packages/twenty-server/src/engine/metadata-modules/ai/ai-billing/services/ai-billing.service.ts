@@ -188,6 +188,47 @@ export class AiBillingService {
     ]);
   }
 
+  async billExternalUsage({
+    modelId,
+    costInDollars,
+    quantity,
+    workspaceId,
+    operationType,
+    userWorkspaceId,
+    agentId,
+  }: {
+    modelId: ModelId;
+    costInDollars: number;
+    quantity: number;
+    workspaceId: string;
+    operationType: UsageOperationType;
+    userWorkspaceId?: string | null;
+    agentId?: string | null;
+  }): Promise<void> {
+    const creditsUsedMicro = convertDollarsToCreditsMicro(costInDollars);
+
+    this.logger.log(
+      `External usage billing for ${modelId}: $${costInDollars.toFixed(6)}, ${quantity} tokens`,
+    );
+
+    await this.consumeQuota({
+      workspaceId,
+      operationType,
+      spenders: { userWorkspaceId, agentId },
+      cost: { creditsUsedMicro, quantity },
+    });
+
+    await this.emitAiTokenUsageEvent(
+      workspaceId,
+      creditsUsedMicro,
+      quantity,
+      modelId,
+      operationType,
+      agentId,
+      userWorkspaceId,
+    );
+  }
+
   async emitAiTokenUsageEvent(
     workspaceId: string,
     creditsUsedMicro: number,

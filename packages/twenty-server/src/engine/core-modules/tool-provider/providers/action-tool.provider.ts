@@ -23,6 +23,7 @@ import { type ToolIndexEntry } from 'src/engine/core-modules/tool-provider/types
 import { CodeInterpreterService } from 'src/engine/core-modules/code-interpreter/code-interpreter.service';
 import { CreateCalendarEventTool } from 'src/engine/core-modules/tool/tools/calendar-tool/create-calendar-event-tool';
 import { CodeInterpreterTool } from 'src/engine/core-modules/tool/tools/code-interpreter-tool/code-interpreter-tool';
+import { DeliverFileTool } from 'src/engine/core-modules/tool/tools/deliver-file-tool/deliver-file.tool';
 import { DraftEmailTool } from 'src/engine/core-modules/tool/tools/email-tool/draft-email-tool';
 import { FindConnectedAccountsTool } from 'src/engine/core-modules/tool/tools/email-tool/find-connected-accounts-tool';
 import { SendEmailTool } from 'src/engine/core-modules/tool/tools/email-tool/send-email-tool';
@@ -34,6 +35,7 @@ import { DriveListSpacesTool } from 'src/engine/core-modules/tool/tools/drive-to
 import { DriveReadFileTool } from 'src/engine/core-modules/tool/tools/drive-tool/drive-read-file.tool';
 import { DriveShareItemTool } from 'src/engine/core-modules/tool/tools/drive-tool/drive-share-item.tool';
 import { HttpTool } from 'src/engine/core-modules/tool/tools/http-tool/http-tool';
+import { ImageGenerateTool } from 'src/engine/core-modules/tool/tools/image-generate-tool/image-generate-tool';
 import { NavigateAppTool } from 'src/engine/core-modules/tool/tools/navigate-tool/navigate-app-tool';
 import { ExtractJsonPathsTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/extract-json-paths-tool';
 import { SearchOutputTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/search-output-tool';
@@ -64,6 +66,8 @@ export class ActionToolProvider implements ToolProvider {
     private readonly driveCopyFileTool: DriveCopyFileTool,
     private readonly driveShareItemTool: DriveShareItemTool,
     private readonly codeInterpreterTool: CodeInterpreterTool,
+    private readonly imageGenerateTool: ImageGenerateTool,
+    private readonly deliverFileTool: DeliverFileTool,
     private readonly navigateAppTool: NavigateAppTool,
     private readonly extractJsonPathsTool: ExtractJsonPathsTool,
     private readonly searchOutputTool: SearchOutputTool,
@@ -87,6 +91,8 @@ export class ActionToolProvider implements ToolProvider {
       ['copy_file_to_drive', this.driveCopyFileTool],
       ['share_drive_item', this.driveShareItemTool],
       ['code_interpreter', this.codeInterpreterTool],
+      ['image_generate', this.imageGenerateTool],
+      ['deliver_file', this.deliverFileTool],
       ['navigate_app', this.navigateAppTool],
       ['extract_json_paths', this.extractJsonPathsTool],
       ['search_output', this.searchOutputTool],
@@ -302,6 +308,34 @@ export class ActionToolProvider implements ToolProvider {
       );
     }
 
+    const hasAiPermission = await this.permissionsService.hasToolPermission(
+      context.rolePermissionConfig,
+      context.workspaceId,
+      PermissionFlagType.AI,
+    );
+
+    if (hasAiPermission) {
+      descriptors.push(
+        this.buildDescriptor(
+          'deliver_file',
+          this.deliverFileTool,
+          includeSchemas,
+          context.locale,
+        ),
+      );
+
+      if (this.imageGenerateTool.isConfigured()) {
+        descriptors.push(
+          this.buildDescriptor(
+            'image_generate',
+            this.imageGenerateTool,
+            includeSchemas,
+            context.locale,
+          ),
+        );
+      }
+    }
+
     return descriptors;
   }
 
@@ -323,6 +357,9 @@ export class ActionToolProvider implements ToolProvider {
       userId: context.userId,
       userWorkspaceId: context.userWorkspaceId,
       threadId: context.threadId,
+      modelId: context.modelId,
+      aiModelTier: context.aiModelTier,
+      usageOperationType: context.usageOperationType,
       onCodeExecutionUpdate: context.onCodeExecutionUpdate,
     });
   }

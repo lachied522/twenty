@@ -125,6 +125,20 @@ const buildToolDisplayMessage = ({
         loadingLabel: t`Running code`,
       });
     }
+    case 'image_generate': {
+      return pickStatusLabel({
+        isFinished,
+        completedLabel: t`Generated image`,
+        loadingLabel: t`Generating image`,
+      });
+    }
+    case 'deliver_file': {
+      return pickStatusLabel({
+        isFinished,
+        completedLabel: t`Delivered file`,
+        loadingLabel: t`Delivering file`,
+      });
+    }
     case 'composio_search_tools': {
       const query =
         typeof input === 'object' &&

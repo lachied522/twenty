@@ -447,6 +447,9 @@ export class ToolRegistryService {
       userWorkspaceId: context.userWorkspaceId,
       threadId: context.threadId,
       locale: context.locale,
+      modelId: context.modelId,
+      aiModelTier: context.aiModelTier,
+      usageOperationType: context.usageOperationType,
       onCodeExecutionUpdate: context.onCodeExecutionUpdate,
     };
   }

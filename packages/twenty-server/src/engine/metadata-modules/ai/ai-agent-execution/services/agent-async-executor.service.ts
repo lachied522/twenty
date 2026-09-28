@@ -242,6 +242,8 @@ export class AgentAsyncExecutorService {
       actorContext,
       userId,
       userWorkspaceId,
+      modelId: agent.modelId,
+      usageOperationType: UsageOperationType.AI_WORKFLOW_TOKEN,
     };
 
     const fullCatalog = await this.toolRegistry.buildToolIndex(
@@ -319,6 +321,8 @@ export class AgentAsyncExecutorService {
       actorContext,
       userId,
       userWorkspaceId,
+      modelId: agent.modelId,
+      usageOperationType: UsageOperationType.AI_WORKFLOW_TOKEN,
     };
 
     const skillAccessContext = {

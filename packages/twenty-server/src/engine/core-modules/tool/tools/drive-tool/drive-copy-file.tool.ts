@@ -15,7 +15,7 @@ export const DriveCopyFileInputZodSchema = z.object({
     .string()
     .uuid()
     .describe(
-      'fileId of a file already harvested into this chat (code_interpreter output) or an existing Drive file',
+      'fileId of a file already harvested into this chat (image_generate, code_interpreter, or user upload) or an existing Drive file',
     ),
   path: z
     .string()

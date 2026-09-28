@@ -346,6 +346,50 @@ describe('getToolDisplayMessage', () => {
     });
   });
 
+  describe('image_generate', () => {
+    it('should show generating and generated labels', () => {
+      expect(
+        getToolDisplayMessage({
+          input: { prompt: 'A puppy' },
+          toolName: 'image_generate',
+          isFinished: false,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Generating image');
+
+      expect(
+        getToolDisplayMessage({
+          input: { prompt: 'A puppy' },
+          toolName: 'image_generate',
+          isFinished: true,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Generated image');
+    });
+  });
+
+  describe('deliver_file', () => {
+    it('should show delivering and delivered labels', () => {
+      expect(
+        getToolDisplayMessage({
+          input: { fileId: '1f0c8d2e-3b4a-4c5d-8e6f-7a8b9c0d1e2f' },
+          toolName: 'deliver_file',
+          isFinished: false,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Delivering file');
+
+      expect(
+        getToolDisplayMessage({
+          input: { fileId: '1f0c8d2e-3b4a-4c5d-8e6f-7a8b9c0d1e2f' },
+          toolName: 'deliver_file',
+          isFinished: true,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Delivered file');
+    });
+  });
+
   describe('default tool labels', () => {
     it('should use default Ran/Running for non-CRUD tools', () => {
       const displayContext = makeDisplayContext({
@@ -659,6 +703,32 @@ describe('getToolDisplayMessage', () => {
       });
 
       expect(message).toBe('Analyzing spreadsheet');
+    });
+
+    it('should unwrap execute_tool for image_generate and deliver_file', () => {
+      expect(
+        getToolDisplayMessage({
+          input: {
+            toolName: 'image_generate',
+            arguments: { prompt: 'A puppy' },
+          },
+          toolName: 'execute_tool',
+          isFinished: false,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Generating image');
+
+      expect(
+        getToolDisplayMessage({
+          input: {
+            toolName: 'deliver_file',
+            arguments: { fileId: '1f0c8d2e-3b4a-4c5d-8e6f-7a8b9c0d1e2f' },
+          },
+          toolName: 'execute_tool',
+          isFinished: true,
+          displayContext: emptyDisplayContext,
+        }),
+      ).toBe('Delivered file');
     });
 
     it('should unwrap execute_tool and use meta-tool handlers for learn_tools', () => {

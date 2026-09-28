@@ -1,4 +1,5 @@
 import { TerminalOutput } from '@/ai/components/TerminalOutput';
+import { isPreviewableImageMimeType } from '@/ai/utils/isPreviewableImageMimeType';
 import { styled } from '@linaria/react';
 import { useContext, useState } from 'react';
 import { useLingui } from '@lingui/react/macro';
@@ -157,16 +158,6 @@ type CodeExecutionDisplayProps = {
   isRunning?: boolean;
 };
 
-const isPreviewableMimeType = (mimeType?: string): boolean => {
-  if (!mimeType) {
-    return false;
-  }
-
-  return ['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(
-    mimeType,
-  );
-};
-
 export const CodeExecutionDisplay = ({
   code,
   stdout,
@@ -315,7 +306,7 @@ export const CodeExecutionDisplay = ({
                 return (
                   <StyledFileCard key={file.fileId}>
                     <StyledFilePreview>
-                      {isPreviewableMimeType(file.mimeType) ? (
+                      {isPreviewableImageMimeType(file.mimeType) ? (
                         <StyledPreviewImage
                           src={file.url}
                           alt={filename}

@@ -10,6 +10,7 @@ import { JwtModule } from 'src/engine/core-modules/jwt/jwt.module';
 import { SecureHttpClientModule } from 'src/engine/core-modules/secure-http-client/secure-http-client.module';
 import { CreateCalendarEventTool } from 'src/engine/core-modules/tool/tools/calendar-tool/create-calendar-event-tool';
 import { CodeInterpreterTool } from 'src/engine/core-modules/tool/tools/code-interpreter-tool/code-interpreter-tool';
+import { DeliverFileTool } from 'src/engine/core-modules/tool/tools/deliver-file-tool/deliver-file.tool';
 import { DraftEmailTool } from 'src/engine/core-modules/tool/tools/email-tool/draft-email-tool';
 import { EmailComposerService } from 'src/engine/core-modules/tool/tools/email-tool/email-composer.service';
 import { FindConnectedAccountsTool } from 'src/engine/core-modules/tool/tools/email-tool/find-connected-accounts-tool';
@@ -22,12 +23,14 @@ import { DriveListSpacesTool } from 'src/engine/core-modules/tool/tools/drive-to
 import { DriveReadFileTool } from 'src/engine/core-modules/tool/tools/drive-tool/drive-read-file.tool';
 import { DriveShareItemTool } from 'src/engine/core-modules/tool/tools/drive-tool/drive-share-item.tool';
 import { HttpTool } from 'src/engine/core-modules/tool/tools/http-tool/http-tool';
+import { ImageGenerateTool } from 'src/engine/core-modules/tool/tools/image-generate-tool/image-generate-tool';
 import { NavigateAppTool } from 'src/engine/core-modules/tool/tools/navigate-tool/navigate-app-tool';
 import { ExtractJsonPathsTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/extract-json-paths-tool';
 import { SearchOutputTool } from 'src/engine/core-modules/tool/tools/output-navigation-tool/search-output-tool';
 import { SearchHelpCenterTool } from 'src/engine/core-modules/tool/tools/search-help-center-tool/search-help-center-tool';
 import { ToolOutputSpillService } from 'src/engine/core-modules/tool/services/tool-output-spill.service';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
+import { AiBillingModule } from 'src/engine/metadata-modules/ai/ai-billing/ai-billing.module';
 import { ConnectedAccountMetadataModule } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.module';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { NavigationMenuItemModule } from 'src/engine/metadata-modules/navigation-menu-item/navigation-menu-item.module';
@@ -54,6 +57,7 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     ViewModule,
     NavigationMenuItemModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
+    AiBillingModule,
   ],
   providers: [
     HttpTool,
@@ -71,6 +75,8 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     DriveCopyFileTool,
     DriveShareItemTool,
     CodeInterpreterTool,
+    ImageGenerateTool,
+    DeliverFileTool,
     NavigateAppTool,
     ExtractJsonPathsTool,
     SearchOutputTool,
@@ -93,6 +99,8 @@ import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspac
     DriveCopyFileTool,
     DriveShareItemTool,
     CodeInterpreterTool,
+    ImageGenerateTool,
+    DeliverFileTool,
     NavigateAppTool,
     ExtractJsonPathsTool,
     SearchOutputTool,

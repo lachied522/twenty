@@ -7,8 +7,10 @@ import { AnimatedExpandableContainer } from 'twenty-ui/layout';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
 import { CodeExecutionDisplay } from '@/ai/components/CodeExecutionDisplay';
+import { DeliveredFileCard } from '@/ai/components/DeliveredFileCard';
 import { ShimmeringText } from '@/ai/components/ShimmeringText';
 import { useToolDisplayContext } from '@/ai/hooks/useToolDisplayContext';
+import { getDeliveredFileFromToolOutput } from '@/ai/utils/getDeliveredFileFromToolOutput';
 import { getToolDisplayMessage } from '@/ai/utils/tool-display/get-tool-display-message';
 import { unwrapToolInput } from '@/ai/utils/tool-display/unwrap-tool-input.util';
 import { getToolIcon } from '@/ai/utils/getToolIcon';
@@ -148,6 +150,20 @@ export const ToolStepRenderer = ({
   });
 
   const displayContext = useToolDisplayContext();
+  const deliveredFile =
+    toolName === 'deliver_file' ? getDeliveredFileFromToolOutput(output) : null;
+
+  if (deliveredFile) {
+    return (
+      <DeliveredFileCard
+        filename={deliveredFile.filename}
+        url={deliveredFile.url}
+        mimeType={deliveredFile.mimeType}
+        sizeBytes={deliveredFile.sizeBytes}
+      />
+    );
+  }
+
   const hasError = isDefined(errorText);
   const isCodeInterpreter = toolName === 'code_interpreter';
   const isExpandable = isDefined(output) || hasError || isCodeInterpreter;

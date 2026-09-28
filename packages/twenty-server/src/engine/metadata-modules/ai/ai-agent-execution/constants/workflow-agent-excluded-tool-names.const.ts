@@ -5,4 +5,5 @@ export const WORKFLOW_AGENT_EXCLUDED_TOOL_NAMES = [
   'navigate_app',
   'create_file_upload',
   'complete_file_upload',
+  'deliver_file',
 ] as const satisfies readonly ActionToolId[];
