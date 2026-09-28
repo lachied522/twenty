@@ -1,0 +1,2 @@
+export const ADD_SKILL_OWNERSHIP_AND_SHARES_UPGRADE_COMMAND_NAME =
+  '2.41.0_AddSkillOwnershipAndSharesFastInstanceCommand_1789985256141';
