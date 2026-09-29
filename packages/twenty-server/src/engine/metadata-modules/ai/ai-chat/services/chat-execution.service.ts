@@ -63,6 +63,7 @@ import { AI_CHAT_EXCLUDED_TOOL_NAMES } from 'src/engine/metadata-modules/ai/ai-c
 import { AI_CHAT_STREAM_FUNCTION_ID } from 'src/engine/metadata-modules/ai/ai-chat/constants/ai-chat-stream-function-id.constant';
 import { AI_CHAT_TOOL_NAMES_TO_PRELOAD } from 'src/engine/metadata-modules/ai/ai-chat/constants/ai-chat-tool-names-to-preload.const';
 import { AI_CHAT_WORKSPACE_SETUP_STREAM_FUNCTION_ID } from 'src/engine/metadata-modules/ai/ai-chat/constants/ai-chat-workspace-setup-stream-function-id.constant';
+import { AgentUserMemoryService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-user-memory.service';
 import { MessagePruningService } from 'src/engine/metadata-modules/ai/ai-chat/services/message-pruning.service';
 import {
   ASK_QUESTIONS_TOOL_NAME,
@@ -140,6 +141,7 @@ export class ChatExecutionService {
     private readonly messagePruningService: MessagePruningService,
     private readonly metricsService: MetricsService,
     private readonly composioService: ComposioService,
+    private readonly agentUserMemoryService: AgentUserMemoryService,
   ) {}
 
   async streamChat({
@@ -370,6 +372,15 @@ export class ChatExecutionService {
       ? await this.composioService.listConnectedToolkitNames(userWorkspaceId)
       : [];
 
+    const memories = isWorkspaceSetupThread
+      ? []
+      : (
+          await this.agentUserMemoryService.findByUserWorkspaceId({
+            workspaceId: workspace.id,
+            userWorkspaceId,
+          })
+        ).map((memory) => memory.content);
+
     const systemPrompt = buildFullSystemPrompt({
       toolCatalog,
       skillCatalog,
@@ -381,6 +392,7 @@ export class ChatExecutionService {
       },
       workspaceInstructions: workspace.aiAdditionalInstructions ?? undefined,
       userContext,
+      memories,
       isWorkspaceSetupThread,
       connectedToolkitNames,
       isComposioEnabled,

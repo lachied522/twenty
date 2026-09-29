@@ -63,11 +63,9 @@ describe('buildFullSystemPrompt', () => {
   it('should keep the standard composition for regular threads', () => {
     const prompt = buildPrompt(false);
 
+    expect(prompt).toContain('You are Gizmo - a helpful business assistant');
     expect(prompt).toContain(
-      'You are Gizmo - a super helpful business assistant',
-    );
-    expect(prompt).toContain(
-      'Write in Australian English (organise, colour, centre, licence).',
+      'Use Australian English (organise, colour, centre, licence).',
     );
     expect(prompt).toContain('## Integrations');
     expect(prompt).toContain(
@@ -78,6 +76,7 @@ describe('buildFullSystemPrompt', () => {
     expect(prompt).toContain('Always answer in bullet points.');
     expect(prompt).toContain('Record References - IMPORTANT');
     expect(prompt).toContain('## User Context');
+    expect(prompt).not.toContain('## Memories');
     expect(prompt).not.toContain(
       'kicking off the setup of this brand-new workspace',
     );
@@ -94,7 +93,7 @@ describe('buildFullSystemPrompt', () => {
     expect(prompt).toContain('## User Context');
     expect(prompt).toContain('Job title: COO');
     expect(prompt).not.toContain(
-      'You are Gizmo - a super helpful business assistant',
+      'You are Gizmo - a helpful business assistant',
     );
     expect(prompt).not.toContain('A <browsing_context> tag may appear');
   });
@@ -104,5 +103,35 @@ describe('buildFullSystemPrompt', () => {
 
     expect(prompt).not.toContain('## Workspace Instructions');
     expect(prompt).not.toContain('Always answer in bullet points.');
+  });
+
+  it('should inject memories after user context on regular threads', () => {
+    const prompt = buildFullSystemPrompt({
+      toolCatalog: [],
+      skillCatalog: [],
+      preloadedTools: [],
+      userContext: USER_CONTEXT,
+      memories: ['User prefers concise replies'],
+    });
+
+    expect(prompt).toContain('## Memories');
+    expect(prompt).toContain('- User prefers concise replies');
+    expect(prompt.indexOf('## User Context')).toBeLessThan(
+      prompt.indexOf('## Memories'),
+    );
+  });
+
+  it('should omit memories on workspace setup threads', () => {
+    const prompt = buildFullSystemPrompt({
+      toolCatalog: [],
+      skillCatalog: [],
+      preloadedTools: [],
+      userContext: USER_CONTEXT,
+      memories: ['User prefers concise replies'],
+      isWorkspaceSetupThread: true,
+    });
+
+    expect(prompt).not.toContain('## Memories');
+    expect(prompt).not.toContain('User prefers concise replies');
   });
 });

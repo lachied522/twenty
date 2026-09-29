@@ -1,0 +1,1 @@
+export const CHAT_MEMORY_MAX_CONTENT_LENGTH = 500;

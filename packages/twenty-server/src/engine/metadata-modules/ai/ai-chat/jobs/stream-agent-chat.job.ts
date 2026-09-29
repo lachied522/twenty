@@ -40,6 +40,7 @@ import { AgentChatStreamHeartbeatService } from 'src/engine/metadata-modules/ai/
 import { AgentChatStreamingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-streaming.service';
 import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat.service';
 import { ChatExecutionService } from 'src/engine/metadata-modules/ai/ai-chat/services/chat-execution.service';
+import { ChatMemoryManagerService } from 'src/engine/metadata-modules/ai/ai-chat/services/chat-memory-manager.service';
 import { type AgentChatTurnOutcome } from 'src/engine/metadata-modules/ai/ai-chat/types/agent-chat-turn-outcome.type';
 import {
   classifyAgentChatTurnOutcome,
@@ -88,6 +89,7 @@ export class StreamAgentChatJob {
     private readonly streamHeartbeatService: AgentChatStreamHeartbeatService,
     private readonly metricsService: MetricsService,
     private readonly aiModelRegistryService: AiModelRegistryService,
+    private readonly chatMemoryManagerService: ChatMemoryManagerService,
   ) {}
 
   @Process(STREAM_AGENT_CHAT_JOB_NAME)
@@ -766,6 +768,12 @@ export class StreamAgentChatJob {
 
     if (isDefined(outcome)) {
       this.recordTurnOutcome(outcome, args.turnModelId);
+      await this.chatMemoryManagerService.enqueueAfterCompletedTurn({
+        outcome,
+        threadId: args.threadId,
+        workspaceId: args.workspaceId,
+        userWorkspaceId: args.userWorkspaceId,
+      });
     }
   }
 

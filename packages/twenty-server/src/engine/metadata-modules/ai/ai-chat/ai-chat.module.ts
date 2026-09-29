@@ -28,7 +28,9 @@ import { DashboardToolsModule } from 'src/modules/dashboard/tools/dashboard-tool
 import { WorkflowToolsModule } from 'src/modules/workflow/workflow-tools/workflow-tools.module';
 
 import { AgentChatThreadEntity } from './entities/agent-chat-thread.entity';
+import { AgentUserMemoryEntity } from './entities/agent-user-memory.entity';
 import { StreamAgentChatJob } from './jobs/stream-agent-chat.job';
+import { UpdateChatMemoriesJob } from './jobs/update-chat-memories.job';
 import { AgentChatResolver } from './resolvers/agent-chat.resolver';
 import { AgentChatSubscriptionResolver } from './resolvers/agent-chat-subscription.resolver';
 import { WorkspaceSetupChatResolver } from './resolvers/workspace-setup-chat.resolver';
@@ -39,7 +41,9 @@ import { AgentChatStreamHeartbeatService } from './services/agent-chat-stream-he
 import { AgentChatStreamingService } from './services/agent-chat-streaming.service';
 import { AgentChatService } from './services/agent-chat.service';
 import { AgentTitleGenerationService } from './services/agent-title-generation.service';
+import { AgentUserMemoryService } from './services/agent-user-memory.service';
 import { ChatExecutionService } from './services/chat-execution.service';
+import { ChatMemoryManagerService } from './services/chat-memory-manager.service';
 import { MessagePruningService } from './services/message-pruning.service';
 import { SystemPromptBuilderService } from './services/system-prompt-builder.service';
 
@@ -47,6 +51,7 @@ import { SystemPromptBuilderService } from './services/system-prompt-builder.ser
   imports: [
     TypeOrmModule.forFeature([
       AgentChatThreadEntity,
+      AgentUserMemoryEntity,
       FileEntity,
       UserWorkspaceEntity,
       WorkspaceEntity,
@@ -80,15 +85,19 @@ import { SystemPromptBuilderService } from './services/system-prompt-builder.ser
     AgentChatStreamingService,
     WorkspaceSetupChatService,
     AgentTitleGenerationService,
+    AgentUserMemoryService,
     ChatExecutionService,
+    ChatMemoryManagerService,
     MessagePruningService,
     StreamAgentChatJob,
     SystemPromptBuilderService,
+    UpdateChatMemoriesJob,
     AiGraphqlApiExceptionInterceptor,
     provideWorkspaceScopedRepository(AgentChatThreadEntity),
     provideWorkspaceScopedRepository(AgentTurnEntity),
     provideWorkspaceScopedRepository(AgentMessageEntity),
     provideWorkspaceScopedRepository(AgentMessagePartEntity),
+    provideWorkspaceScopedRepository(AgentUserMemoryEntity),
     provideWorkspaceScopedRepository(FileEntity),
   ],
   exports: [

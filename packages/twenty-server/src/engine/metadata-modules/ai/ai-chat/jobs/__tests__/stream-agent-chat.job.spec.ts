@@ -255,6 +255,9 @@ describe('StreamAgentChatJob', () => {
         .fn()
         .mockReturnValue({ modelId: 'openai/gpt-5.6-luna' }),
     };
+    const chatMemoryManagerService = {
+      enqueueAfterCompletedTurn: jest.fn().mockResolvedValue(undefined),
+    };
     const job = new StreamAgentChatJob(
       threadRepository as never,
       workspaceRepository as never,
@@ -266,6 +269,7 @@ describe('StreamAgentChatJob', () => {
       streamHeartbeatService as never,
       metricsService as never,
       aiModelRegistryService as never,
+      chatMemoryManagerService as never,
     );
 
     const turnCounts = (key: string) =>
@@ -283,6 +287,7 @@ describe('StreamAgentChatJob', () => {
       cancelCallbacks,
       metricsService,
       aiModelRegistryService,
+      chatMemoryManagerService,
       turnCounts,
     };
   };
@@ -661,7 +666,7 @@ describe('StreamAgentChatJob', () => {
   });
 
   it('counts a text reply once, as an answered completion', async () => {
-    const { job, turnCounts } = buildJob();
+    const { job, turnCounts, chatMemoryManagerService } = buildJob();
 
     await job.handle(jobData);
 
@@ -672,10 +677,18 @@ describe('StreamAgentChatJob', () => {
     ]);
     expect(turnCounts('ai-chat/turn-failed')).toEqual([]);
     expect(turnCounts('ai-chat/turn-cancelled')).toEqual([]);
+    expect(
+      chatMemoryManagerService.enqueueAfterCompletedTurn,
+    ).toHaveBeenCalledWith({
+      outcome: { kind: 'completed', outcome: 'answered' },
+      threadId: 'thread-id',
+      workspaceId: 'workspace-id',
+      userWorkspaceId: 'user-workspace-id',
+    });
   });
 
   it('counts a turn that ended on a question as completed and awaiting the user', async () => {
-    const { job, turnCounts } = buildJob({
+    const { job, turnCounts, chatMemoryManagerService } = buildJob({
       chatStream: createFakeChatStream({
         parts: PENDING_QUESTION_PARTS,
       }),
@@ -689,6 +702,14 @@ describe('StreamAgentChatJob', () => {
       }),
     ]);
     expect(turnCounts('ai-chat/turn-failed')).toEqual([]);
+    expect(
+      chatMemoryManagerService.enqueueAfterCompletedTurn,
+    ).toHaveBeenCalledWith({
+      outcome: { kind: 'completed', outcome: 'awaiting_user' },
+      threadId: 'thread-id',
+      workspaceId: 'workspace-id',
+      userWorkspaceId: 'user-workspace-id',
+    });
   });
 
   it('counts an aborted turn as cancelled rather than leaving it unaccounted', async () => {

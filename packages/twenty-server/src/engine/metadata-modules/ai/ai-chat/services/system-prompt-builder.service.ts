@@ -8,6 +8,8 @@ import { buildToolCatalogSection } from 'src/engine/core-modules/tool-provider/u
 import { AgentActorContextService } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-actor-context.service';
 import { AI_CHAT_EXCLUDED_TOOL_NAMES } from 'src/engine/metadata-modules/ai/ai-chat/constants/ai-chat-excluded-tool-names.const';
 import { CHAT_SYSTEM_PROMPTS } from 'src/engine/metadata-modules/ai/ai-chat/constants/chat-system-prompts.const';
+import { AgentUserMemoryService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-user-memory.service';
+import { buildMemoriesSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-memories-section.util';
 import { buildSkillCatalogSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-skill-catalog-section.util';
 import { buildUserContextSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-user-context-section.util';
 import { buildWorkspaceInstructionsSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-workspace-instructions-section.util';
@@ -33,6 +35,7 @@ export class SystemPromptBuilderService {
     private readonly toolRegistry: ToolRegistryService,
     private readonly skillService: SkillService,
     private readonly agentActorContextService: AgentActorContextService,
+    private readonly agentUserMemoryService: AgentUserMemoryService,
   ) {}
 
   async buildPreview(
@@ -95,6 +98,22 @@ export class SystemPromptBuilderService {
         title: 'User Context',
         content: userSection,
         estimatedTokenCount: estimateTokenCount(userSection),
+      });
+    }
+
+    const memories = (
+      await this.agentUserMemoryService.findByUserWorkspaceId({
+        workspaceId,
+        userWorkspaceId,
+      })
+    ).map((memory) => memory.content);
+    const memoriesSection = buildMemoriesSection(memories);
+
+    if (isNonEmptyString(memoriesSection)) {
+      sections.push({
+        title: 'Memories',
+        content: memoriesSection,
+        estimatedTokenCount: estimateTokenCount(memoriesSection),
       });
     }
 

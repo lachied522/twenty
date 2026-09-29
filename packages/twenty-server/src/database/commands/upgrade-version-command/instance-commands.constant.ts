@@ -195,6 +195,7 @@ import { CreateDriveCoreTablesFastInstanceCommand } from 'src/database/commands/
 import { AddComposioSessionIdToUserWorkspaceFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-41/2-41-instance-command-fast-1789983137138-add-composio-session-id-to-user-workspace';
 import { AddSkillOwnershipAndSharesFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-41/2-41-instance-command-fast-1789985256141-add-skill-ownership-and-shares';
 import { AddIsHiddenToSkillFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-41/2-41-instance-command-fast-1789988082553-add-is-hidden-to-skill';
+import { CreateAgentUserMemoryCoreTableFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-41/2-41-instance-command-fast-1790648984664-create-agent-user-memory-core-table';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -392,4 +393,5 @@ export const INSTANCE_COMMANDS = [
   AddComposioSessionIdToUserWorkspaceFastInstanceCommand,
   AddSkillOwnershipAndSharesFastInstanceCommand,
   AddIsHiddenToSkillFastInstanceCommand,
+  CreateAgentUserMemoryCoreTableFastInstanceCommand,
 ];

@@ -1,0 +1,2 @@
+export const CREATE_AGENT_USER_MEMORY_CORE_TABLE_UPGRADE_COMMAND_NAME =
+  '2.41.0_CreateAgentUserMemoryCoreTableFastInstanceCommand_1790648984664';

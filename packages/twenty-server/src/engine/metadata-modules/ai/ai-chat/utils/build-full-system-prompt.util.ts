@@ -6,6 +6,8 @@ import { buildToolCatalogSection } from 'src/engine/core-modules/tool-provider/u
 import { type UserContext } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-actor-context.service';
 import { CHAT_SYSTEM_PROMPTS } from 'src/engine/metadata-modules/ai/ai-chat/constants/chat-system-prompts.const';
 import { WORKSPACE_SETUP_SYSTEM_PROMPT } from 'src/engine/metadata-modules/ai/ai-chat/constants/workspace-setup-system-prompt.constant';
+import { buildConnectedIntegrationsSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-connected-integrations-section.util';
+import { buildMemoriesSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-memories-section.util';
 import {
   buildReferencedSkillsSection,
   type ReferencedSkill,
@@ -14,7 +16,6 @@ import { buildSkillCatalogSection } from 'src/engine/metadata-modules/ai/ai-chat
 import { buildUploadedFilesSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-uploaded-files-section.util';
 import { buildUserContextSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-user-context-section.util';
 import { buildWorkspaceInstructionsSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-workspace-instructions-section.util';
-import { buildConnectedIntegrationsSection } from 'src/engine/metadata-modules/ai/ai-chat/utils/build-connected-integrations-section.util';
 import { type UploadedFileReference } from 'src/engine/metadata-modules/ai/ai-chat/types/uploaded-file-reference.type';
 import { type FlatSkill } from 'src/engine/metadata-modules/flat-skill/types/flat-skill.type';
 
@@ -26,6 +27,7 @@ export const buildFullSystemPrompt = ({
   uploadedFilesContext,
   workspaceInstructions,
   userContext,
+  memories = [],
   isWorkspaceSetupThread,
   connectedToolkitNames = [],
   isComposioEnabled = false,
@@ -40,6 +42,7 @@ export const buildFullSystemPrompt = ({
   };
   workspaceInstructions?: string;
   userContext?: UserContext;
+  memories?: string[];
   isWorkspaceSetupThread?: boolean;
   connectedToolkitNames?: string[];
   isComposioEnabled?: boolean;
@@ -64,6 +67,14 @@ export const buildFullSystemPrompt = ({
 
   if (userContext) {
     parts.push(buildUserContextSection(userContext));
+  }
+
+  if (!isWorkspaceSetupThread) {
+    const memoriesSection = buildMemoriesSection(memories);
+
+    if (isNonEmptyString(memoriesSection)) {
+      parts.push(memoriesSection);
+    }
   }
 
   if (isComposioEnabled) {
