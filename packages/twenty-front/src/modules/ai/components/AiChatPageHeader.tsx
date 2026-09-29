@@ -5,6 +5,7 @@ import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { useIsMobile } from 'twenty-ui/utilities';
 
 import { AiChatCloseButton } from '@/ai/components/AiChatCloseButton';
+import { AiChatFilesButton } from '@/ai/components/AiChatFilesButton';
 import { AiChatPageThreadHeader } from '@/ai/components/AiChatPageThreadHeader';
 import { AiChatThreadDeleteConfirmationModal } from '@/ai/components/AiChatThreadDeleteConfirmationModal';
 import { AI_CHAT_THREAD_ACTIONS_SURFACE } from '@/ai/constants/AiChatThreadActionsSurface';
@@ -66,7 +67,12 @@ export const AiChatPageHeader = () => {
           thread={currentAiChatThreadData}
         />
       ) : (
-        <StyledHeaderTitle>{isNewChat ? t`New chat` : null}</StyledHeaderTitle>
+        <>
+          <StyledHeaderTitle>
+            {isNewChat ? t`New chat` : null}
+          </StyledHeaderTitle>
+          <AiChatFilesButton />
+        </>
       )}
       {isMobile && <AiChatCloseButton variant="primary" />}
       <AiChatThreadDeleteConfirmationModal

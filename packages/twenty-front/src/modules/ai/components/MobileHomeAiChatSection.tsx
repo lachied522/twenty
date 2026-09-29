@@ -1,20 +1,25 @@
+import { useLingui } from '@lingui/react/macro';
+import { useLocation } from 'react-router-dom';
+
 import { AiChatThreadDeleteConfirmationModal } from '@/ai/components/AiChatThreadDeleteConfirmationModal';
 import { NavigationDrawerAiChatThreadSection } from '@/ai/components/NavigationDrawerAiChatThreadSection';
 import { AI_CHAT_THREAD_ACTIONS_SURFACE } from '@/ai/constants/AiChatThreadActionsSurface';
 import { useAiChatThreadClick } from '@/ai/hooks/useAiChatThreadClick';
 import { useChatThreads } from '@/ai/hooks/useChatThreads';
 import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
+import { getActiveAiChatNavigationThreadId } from '@/ai/utils/getActiveAiChatNavigationThreadId';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useLingui } from '@lingui/react/macro';
 
 const MOBILE_HOME_AI_CHAT_SECTION_ID = 'MobileHomeAiChat';
 
 export const MobileHomeAiChatSection = () => {
   const { t } = useLingui();
+  const location = useLocation();
 
   const currentAiChatThread = useAtomStateValue(currentAiChatThreadState);
   const { handleThreadClick } = useAiChatThreadClick({
     resetNavigationStack: true,
+    shouldOpenInFullPage: true,
   });
   const { threads } = useChatThreads();
 
@@ -28,7 +33,10 @@ export const MobileHomeAiChatSection = () => {
         sectionId={MOBILE_HOME_AI_CHAT_SECTION_ID}
         title={t`Conversations`}
         threads={threads}
-        currentThreadId={currentAiChatThread}
+        currentThreadId={getActiveAiChatNavigationThreadId({
+          currentAiChatThread,
+          pathname: location.pathname,
+        })}
         onThreadClick={handleThreadClick}
       />
       <AiChatThreadDeleteConfirmationModal

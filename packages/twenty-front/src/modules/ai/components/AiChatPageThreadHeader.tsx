@@ -7,6 +7,7 @@ import { Button, IconButton } from 'twenty-ui/input';
 import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
+import { AiChatFilesButton } from '@/ai/components/AiChatFilesButton';
 import { AiChatThreadItemMenu } from '@/ai/components/AiChatThreadItemMenu';
 import { AI_CHAT_THREAD_ACTIONS_SURFACE } from '@/ai/constants/AiChatThreadActionsSurface';
 import { useAiChatThreadRename } from '@/ai/hooks/useAiChatThreadRename';
@@ -110,6 +111,7 @@ export const AiChatPageThreadHeader = ({
             onClick={() => switchToNewChat()}
           />
         )}
+        <AiChatFilesButton />
         <AiChatThreadItemMenu
           threadId={thread.id}
           threadTitle={displayTitle}

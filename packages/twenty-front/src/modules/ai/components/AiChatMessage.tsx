@@ -176,6 +176,7 @@ export const AiChatMessage = ({
             isLastMessageStreaming={isLastMessageStreaming}
             messageParts={agentChatMessage.parts}
             hasError={shouldShowError}
+            messageCreatedAt={agentChatMessage.metadata?.createdAt}
           />
         </StyledMessageText>
         {fileParts.length > 0 && (

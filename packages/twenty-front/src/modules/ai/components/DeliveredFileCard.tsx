@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { type MouseEvent, useState } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 import { IconDownload } from 'twenty-ui/icon';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
@@ -14,6 +15,7 @@ export type DeliveredFileCardProps = {
   url: string;
   mimeType: string;
   sizeBytes?: number;
+  onOpenPreview?: () => void;
 };
 
 const StyledCard = styled.div`
@@ -59,6 +61,19 @@ const StyledFileMeta = styled.div`
   flex-direction: column;
   gap: ${themeCssVariables.spacing['0.5']};
   min-width: 0;
+`;
+
+const StyledFileMetaButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: ${themeCssVariables.font.family};
+  gap: ${themeCssVariables.spacing['0.5']};
+  min-width: 0;
+  padding: 0;
+  text-align: left;
 `;
 
 const StyledStatusLabel = styled.span`
@@ -107,6 +122,7 @@ export const DeliveredFileCard = ({
   url,
   mimeType,
   sizeBytes,
+  onOpenPreview,
 }: DeliveredFileCardProps) => {
   const { t } = useLingui();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -117,27 +133,41 @@ export const DeliveredFileCard = ({
     void downloadFile(url, filename);
   };
 
+  const fileMetaContent = (
+    <>
+      <StyledStatusLabel>
+        {isImage ? t`Image ready` : t`File ready`}
+      </StyledStatusLabel>
+      <StyledFileName title={filename}>{filename}</StyledFileName>
+      {typeof sizeBytes === 'number' && (
+        <StyledFileSize>{formatFileSize(sizeBytes)}</StyledFileSize>
+      )}
+    </>
+  );
+
   return (
     <StyledCard>
       {isImage && (
         <StyledPreviewButton
           type="button"
           aria-label={t`View image`}
-          onClick={() => setIsOverlayOpen(true)}
+          onClick={onOpenPreview ?? (() => setIsOverlayOpen(true))}
         >
           <StyledPreviewImage src={url} alt={filename} loading="lazy" />
         </StyledPreviewButton>
       )}
       <StyledFooter>
-        <StyledFileMeta>
-          <StyledStatusLabel>
-            {isImage ? t`Image ready` : t`File ready`}
-          </StyledStatusLabel>
-          <StyledFileName title={filename}>{filename}</StyledFileName>
-          {typeof sizeBytes === 'number' && (
-            <StyledFileSize>{formatFileSize(sizeBytes)}</StyledFileSize>
-          )}
-        </StyledFileMeta>
+        {isDefined(onOpenPreview) ? (
+          <StyledFileMetaButton
+            type="button"
+            aria-label={t`Preview ${filename}`}
+            onClick={onOpenPreview}
+          >
+            {fileMetaContent}
+          </StyledFileMetaButton>
+        ) : (
+          <StyledFileMeta>{fileMetaContent}</StyledFileMeta>
+        )}
         <StyledDownloadButton type="button" onClick={handleDownload}>
           <IconDownload size={16} />
           {t`Download`}

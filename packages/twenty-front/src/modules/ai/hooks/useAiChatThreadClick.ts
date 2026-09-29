@@ -1,6 +1,7 @@
 import { agentChatUsageComponentFamilyState } from '@/ai/states/agentChatUsageComponentFamilyState';
 import { currentAiChatThreadTitleComponentFamilyState } from '@/ai/states/currentAiChatThreadTitleComponentFamilyState';
 import { threadIdCreatedFromDraftState } from '@/ai/states/threadIdCreatedFromDraftState';
+import { useNavigateToAiChatPage } from '@/ai/hooks/useNavigateToAiChatPage';
 import { useSelectAiChatThread } from '@/ai/hooks/useSelectAiChatThread';
 import { useOpenAskAiPageInSidePanel } from '@/side-panel/hooks/useOpenAskAiPageInSidePanel';
 import { useAtomComponentFamilyStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateCallbackState';
@@ -12,12 +13,14 @@ import { isCurrentPathAiChatPage } from '~/utils/isCurrentPathAiChatPage';
 
 export type UseAiChatThreadClickOptions = {
   resetNavigationStack?: boolean;
+  shouldOpenInFullPage?: boolean;
 };
 
 export const useAiChatThreadClick = (
   options: UseAiChatThreadClickOptions = {},
 ) => {
-  const { resetNavigationStack = false } = options;
+  const { resetNavigationStack = false, shouldOpenInFullPage = false } =
+    options;
   const setThreadIdCreatedFromDraft = useSetAtomState(
     threadIdCreatedFromDraftState,
   );
@@ -30,6 +33,7 @@ export const useAiChatThreadClick = (
   );
   const store = useStore();
   const { openAskAiPage } = useOpenAskAiPageInSidePanel();
+  const { navigateToAiChatPage } = useNavigateToAiChatPage();
 
   const handleThreadClick = (thread: AgentChatThread) => {
     setThreadIdCreatedFromDraft(null);
@@ -62,6 +66,11 @@ export const useAiChatThreadClick = (
     );
 
     if (isCurrentPathAiChatPage()) {
+      return;
+    }
+
+    if (shouldOpenInFullPage) {
+      navigateToAiChatPage({ threadId: thread.id });
       return;
     }
 

@@ -6,11 +6,14 @@ import { JsonTree } from 'twenty-ui/json-visualizer';
 import { AnimatedExpandableContainer } from 'twenty-ui/layout';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
+import { AiChatFileRegisterEffect } from '@/ai/components/AiChatFileRegisterEffect';
 import { CodeExecutionDisplay } from '@/ai/components/CodeExecutionDisplay';
 import { DeliveredFileCard } from '@/ai/components/DeliveredFileCard';
+import { AiChatFilesContext } from '@/ai/contexts/AiChatFilesContext';
 import { ShimmeringText } from '@/ai/components/ShimmeringText';
 import { useToolDisplayContext } from '@/ai/hooks/useToolDisplayContext';
 import { getDeliveredFileFromToolOutput } from '@/ai/utils/getDeliveredFileFromToolOutput';
+import { isPreviewableImageMimeType } from '@/ai/utils/isPreviewableImageMimeType';
 import { getToolDisplayMessage } from '@/ai/utils/tool-display/get-tool-display-message';
 import { unwrapToolInput } from '@/ai/utils/tool-display/unwrap-tool-input.util';
 import { getToolIcon } from '@/ai/utils/getToolIcon';
@@ -131,11 +134,14 @@ type TabType = 'output' | 'input';
 export const ToolStepRenderer = ({
   toolPart,
   isStreaming,
+  messageCreatedAt,
 }: {
   toolPart: ToolUIPart | DynamicToolUIPart;
   isStreaming: boolean;
+  messageCreatedAt?: string;
 }) => {
   const { theme } = useContext(ThemeContext);
+  const aiChatFilesContext = useContext(AiChatFilesContext);
   const { t } = useLingui();
   const { copyToClipboard } = useCopyToClipboard();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -155,12 +161,27 @@ export const ToolStepRenderer = ({
 
   if (deliveredFile) {
     return (
-      <DeliveredFileCard
-        filename={deliveredFile.filename}
-        url={deliveredFile.url}
-        mimeType={deliveredFile.mimeType}
-        sizeBytes={deliveredFile.sizeBytes}
-      />
+      <>
+        <AiChatFileRegisterEffect
+          toolCallId={toolPart.toolCallId}
+          deliveredFile={deliveredFile}
+          isStreaming={isStreaming}
+          messageCreatedAt={messageCreatedAt}
+        />
+        <DeliveredFileCard
+          filename={deliveredFile.filename}
+          url={deliveredFile.url}
+          mimeType={deliveredFile.mimeType}
+          sizeBytes={deliveredFile.sizeBytes}
+          onOpenPreview={
+            isDefined(aiChatFilesContext) &&
+            !isPreviewableImageMimeType(deliveredFile.mimeType)
+              ? () =>
+                  aiChatFilesContext.openChatFilePreview(toolPart.toolCallId)
+              : undefined
+          }
+        />
+      </>
     );
   }
 

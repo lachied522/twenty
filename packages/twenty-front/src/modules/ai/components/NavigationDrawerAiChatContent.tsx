@@ -21,6 +21,7 @@ import { useChatThreads } from '@/ai/hooks/useChatThreads';
 import { useSwitchToNewAiChat } from '@/ai/hooks/useSwitchToNewAiChat';
 import { agentChatThreadGroupByState } from '@/ai/states/agentChatThreadGroupByState';
 import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
+import { getActiveAiChatNavigationThreadId } from '@/ai/utils/getActiveAiChatNavigationThreadId';
 import { groupThreadsByDate } from '@/ai/utils/groupThreadsByDate';
 import { isComposioEnabledState } from '@/client-config/states/isComposioEnabledState';
 import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItem';
@@ -74,8 +75,13 @@ export const NavigationDrawerAiChatContent = () => {
   const isComposioEnabled = useAtomStateValue(isComposioEnabledState);
 
   const currentAiChatThread = useAtomStateValue(currentAiChatThreadState);
+  const activeThreadId = getActiveAiChatNavigationThreadId({
+    currentAiChatThread,
+    pathname: location.pathname,
+  });
   const { handleThreadClick } = useAiChatThreadClick({
     resetNavigationStack: true,
+    shouldOpenInFullPage: true,
   });
   const agentChatThreadGroupBy = useAtomStateValue(agentChatThreadGroupByState);
 
@@ -141,7 +147,7 @@ export const NavigationDrawerAiChatContent = () => {
                 sectionId={`AiChatDateGroup:${dateGroup.id}`}
                 title={dateGroup.title}
                 threads={dateGroup.threads}
-                currentThreadId={currentAiChatThread}
+                currentThreadId={activeThreadId}
                 onThreadClick={handleThreadClick}
                 rightIcon={index === 0 ? filterDropdown : undefined}
               />
@@ -152,7 +158,7 @@ export const NavigationDrawerAiChatContent = () => {
             sectionId={AI_CHAT_RECENTS_NAVIGATION_SECTION_ID}
             title={t`Recents`}
             threads={threads}
-            currentThreadId={currentAiChatThread}
+            currentThreadId={activeThreadId}
             onThreadClick={handleThreadClick}
             rightIcon={filterDropdown}
           />

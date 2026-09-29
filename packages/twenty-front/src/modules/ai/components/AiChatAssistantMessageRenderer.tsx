@@ -28,9 +28,11 @@ const StyledMessagePartsContainer = styled.div`
 const MessagePartRenderer = ({
   part,
   isStreaming,
+  messageCreatedAt,
 }: {
   part: ExtendedUIMessagePart;
   isStreaming: boolean;
+  messageCreatedAt?: string;
 }) => {
   switch (part.type) {
     case 'text':
@@ -63,7 +65,13 @@ const MessagePartRenderer = ({
           );
         }
 
-        return <ToolStepRenderer toolPart={part} isStreaming={isStreaming} />;
+        return (
+          <ToolStepRenderer
+            toolPart={part}
+            isStreaming={isStreaming}
+            messageCreatedAt={messageCreatedAt}
+          />
+        );
       }
       return null;
   }
@@ -73,10 +81,12 @@ export const AiChatAssistantMessageRenderer = ({
   messageParts,
   isLastMessageStreaming,
   hasError,
+  messageCreatedAt,
 }: {
   messageParts: ExtendedUIMessagePart[];
   isLastMessageStreaming: boolean;
   hasError?: boolean;
+  messageCreatedAt?: string;
 }) => {
   const hasCodeExecutionData = messageParts.some(
     (part) => part.type === 'data-code-execution',
@@ -128,6 +138,7 @@ export const AiChatAssistantMessageRenderer = ({
               key={index}
               part={renderItem.part}
               isStreaming={isLastMessageStreaming}
+              messageCreatedAt={messageCreatedAt}
             />
           ),
         )}
